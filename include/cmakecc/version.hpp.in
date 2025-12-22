@@ -1,0 +1,30 @@
+#pragma once
+
+#include <string_view>
+#include <cstdint>
+#include <format>
+
+namespace cmakecc
+{
+
+constexpr struct numver
+{
+private:
+    uint64_t major_ = @PROJECT_VERSION_MAJOR@;
+    uint32_t minor_ = @PROJECT_VERSION_MINOR@;
+    uint32_t patch_ = @PROJECT_VERSION_PATCH@;
+
+public:
+    constexpr numver() = default;
+    constexpr numver(uint64_t major, uint32_t minor, uint32_t patch)
+        : major_(major), minor_(minor), patch_(patch)
+    {}
+    [[nodiscard]] inline constexpr uint64_t major() const { return major_; }
+    [[nodiscard]] inline constexpr uint32_t minor() const { return minor_; }
+    [[nodiscard]] inline constexpr uint32_t patch() const { return patch_; }
+    [[nodiscard]] inline std::string str() const { return std::format("{}.{}.{}", major_, minor_, patch_); }
+
+    [[nodiscard]] inline constexpr auto operator<=>(const numver&) const noexcept = default;
+} version;
+
+}
