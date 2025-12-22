@@ -47,9 +47,9 @@ TEST(package_cmake_workflow_tests, test_package__ok)
     ASSERT_EQ(res, 0);
 }
 
-//TEST(package_cmake_workflow_tests, uninstall__ok)
-//{
-//    const int res = cmake.uninstall(UNINSTALL_SCRIPT_PATH);
-//    ASSERT_EQ(res, 0);
-//    ASSERT_TRUE(!std::filesystem::exists(UNINSTALL_SCRIPT_PATH));
-//}
+TEST(package_cmake_workflow_tests, uninstall__ok)
+{
+    const int res = cmake.uninstall(UNINSTALL_SCRIPT_PATH);
+    ASSERT_EQ(res, 0);
+    ASSERT_TRUE(!std::filesystem::exists(UNINSTALL_SCRIPT_PATH));
+}
