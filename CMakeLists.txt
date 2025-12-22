@@ -53,8 +53,10 @@ write_basic_package_version_file("${PROJECT_BINARY_DIR}/${PACKAGE_NAME}-config-v
     VERSION ${PROJECT_VERSION}
     COMPATIBILITY SameMajorVersion
 )
+configure_file(cmake/config/uninstall.cmake.in ${PROJECT_BINARY_DIR}/uninstall.cmake @ONLY)
 install(FILES
     ${PROJECT_BINARY_DIR}/${PACKAGE_NAME}-config.cmake
     ${PROJECT_BINARY_DIR}/${PACKAGE_NAME}-config-version.cmake
+    ${PROJECT_BINARY_DIR}/uninstall.cmake
     DESTINATION ${PACKAGE_DIR}
 )
