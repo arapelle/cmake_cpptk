@@ -1,0 +1,76 @@
+import os, re
+
+from conan import ConanFile
+from conan.tools.build import check_min_cppstd
+from conan.tools.cmake import CMakeToolchain, CMake, cmake_layout, CMakeDeps
+from conan.tools.files import load, copy, rm
+
+required_conan_version = ">=2.2.0"
+
+class CmaketkRecipe(ConanFile):
+    name = "cmake_cpptk"
+    package_type = "header-library"
+
+    # Optional metadata
+    description = "A C++ library which provides a basic usage of CMake and CTest CLI tools."
+    url = "https://github.com/arapelle/cmake_cpptk"
+    homepage = "https://github.com/arapelle/cmake_cpptk"
+    topics = ("CMake", "CMake tools")
+    license = "MIT"
+    author = "Aymeric Pellé"
+
+    # Binary configuration
+    settings = "os", "compiler", "build_type", "arch"
+    options = {}
+    default_options = {}
+
+    # Build
+    win_bash = os.environ.get('MSYSTEM', None) is not None
+    no_copy_source = True
+
+    # Sources
+    exports_sources = "LICENSE", "CMakeLists.txt", "include/*", "test/*", "cmake/config/*", "test_package/*"
+
+    # Other
+    implements = ["auto_header_only"]
+
+    def set_version(self):
+        cmakelist_content = load(self, os.path.join(self.recipe_folder, "CMakeLists.txt"))
+        version_regex = r"""set\( *PACKAGE_VERSION *?([0-9]+\.[0-9]+\.[0-9]+).*"""
+        self.version = re.search(version_regex, cmakelist_content).group(1)
+
+    def layout(self):
+        cmake_layout(self)
+
+    def validate(self):
+        check_min_cppstd(self, 20)
+
+    def build_requirements(self):
+        if not self.conf.get("tools.build:skip_test", default=True):
+            self.test_requires("gtest/[^1.14]")
+
+    def generate(self):
+        deps = CMakeDeps(self)
+        deps.generate()
+        tc = CMakeToolchain(self)
+        if not self.conf.get("tools.build:skip_test", default=True):
+            tc.variables["CMAKE_CPPTK_BUILD_TESTS"] = "TRUE"
+        tc.generate()
+
+    def build(self):
+        cmake = CMake(self)
+        cmake.configure()
+        if not self.conf.get("tools.build:skip_test", default=True):
+            cmake.build()
+            cmake.ctest(cli_args=["--progress", "--output-on-failure", "--parallel 1"])
+
+    def package(self):
+        copy(self, "LICENSE", src=self.source_folder, dst=os.path.join(self.package_folder, "licenses"))
+        cmake = CMake(self)
+        cmake.install()
+        rm(self, "uninstall.cmake", os.path.join(self.package_folder, "lib", "cmake", self.name))
+
+    def package_info(self):
+        self.cpp_info.bindirs = []
+        self.cpp_info.libdirs = []
+        self.cpp_info.builddirs = [os.path.join("lib", "cmake", self.name)]
