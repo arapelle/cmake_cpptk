@@ -1,0 +1,33 @@
+set(files_to_remove
+    @CMAKE_INSTALL_PREFIX@/include/cmake_cpptk/cmake.hpp
+    @CMAKE_INSTALL_PREFIX@/include/cmake_cpptk/ctest.hpp
+    @CMAKE_INSTALL_PREFIX@/include/cmake_cpptk/cmake_cpptk.hpp
+    @CMAKE_INSTALL_PREFIX@/include/cmake_cpptk/version.hpp
+    @CMAKE_INSTALL_PREFIX@/lib/cmake/cmake_cpptk/cmake_cpptk-targets.cmake
+    @CMAKE_INSTALL_PREFIX@/lib/cmake/cmake_cpptk/cmake_cpptk-config.cmake
+    @CMAKE_INSTALL_PREFIX@/lib/cmake/cmake_cpptk/cmake_cpptk-config-version.cmake
+    @CMAKE_INSTALL_PREFIX@/lib/cmake/cmake_cpptk/uninstall.cmake
+)
+
+message(STATUS "Uninstall...")
+foreach(file ${files_to_remove})
+    while(NOT "${file}" STREQUAL "/usr/local"
+            AND NOT "${file}" STREQUAL "@CMAKE_INSTALL_PREFIX@/include"
+            AND NOT "${file}" STREQUAL "@CMAKE_INSTALL_PREFIX@/lib"
+         )
+        if(EXISTS "${file}" OR IS_SYMLINK "${file}")
+            if(IS_DIRECTORY "${file}")
+                file(GLOB dir_files "${file}/*")
+                list(LENGTH dir_files nb_files)
+                if(${nb_files} EQUAL 0)
+                    message(STATUS "Removing  dir: ${file}")
+                    file(REMOVE_RECURSE "${file}")
+                endif()
+            else()
+                message(STATUS "Removing file: ${file}")
+                file(REMOVE "${file}")
+            endif()
+        endif()
+        get_filename_component(file "${file}" DIRECTORY)
+    endwhile()
+endforeach()
