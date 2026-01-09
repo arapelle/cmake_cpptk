@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.30)
 #-- Package cmaketk ------------------------------------------------------------
 
 set(PACKAGE_NAME cmakecc)
-set(PACKAGE_VERSION 0.1.0) # dev
+set(PACKAGE_VERSION 0.1.0)
 
 project(${PACKAGE_NAME} VERSION ${PACKAGE_VERSION} LANGUAGES CXX)
 include(GNUInstallDirs)
